@@ -1,5 +1,44 @@
-I reviewed the YAML status file and compared it with the Gloo documentation. Here are my observations on the issues we’re facing, along with some proposed steps for resolution:
+Here’s how you can structure the integration test cases in the provided format:
 
-AuthConfig Not Found: The status file indicates that the authConfig for grp-ent-customer-profile.v1-review-initial-98378 is missing, which suggests that either the configuration file is absent or incorrectly specified.
+---
 
-InvalidDestinationWarning: Several upstream services, such as grp-ent-my-accounts.v3-member-home-experience-canary, grp-ent-experience-data-life-events.v1-party-assessment-svc-canary, and grp-ent-xcache.v3-ifa-pnc-auto-canary, are showing “not found” warnings. This may point to missing or misconfigured route or upstream definitions in Gloo.
+### **Test Case 1: Successful marking of document as read**
+
+| **STEP #** | **STEP DESCRIPTION**                                       | **EXPECTED RESULT**                                     | **ACTION**       |
+|------------|-----------------------------------------------------------|--------------------------------------------------------|------------------|
+| 1          | Retrieve a document with valid `GUID` and `date`.         | Document is successfully retrieved.                    | Perform `GET /documents/{guid}/{date}`. |
+| 2          | Call `PATCH /documents/{guid}/{date}/open` to mark it read.| API returns **200 OK**.                                | Perform API call and validate response. |
+| 3          | Verify document's status.                                 | Document status is updated to "read" in the system.    | Check database or API response.         |
+
+---
+
+### **Test Case 2: Service call failure while marking document as read**
+
+| **STEP #** | **STEP DESCRIPTION**                                       | **EXPECTED RESULT**                                     | **ACTION**       |
+|------------|-----------------------------------------------------------|--------------------------------------------------------|------------------|
+| 1          | Retrieve a document with valid `GUID` and `date`.         | Document is successfully retrieved.                    | Perform `GET /documents/{guid}/{date}`. |
+| 2          | Simulate a failure in `PATCH /documents/{guid}/{date}/open` (e.g., return **500 Internal Server Error**). | API returns an error response.                         | Inject error or simulate failure in service. |
+| 3          | Verify Kibana logs.                                       | Error details (e.g., `GUID`, status code, error message) are logged in Kibana. | Check logs in Kibana.                   |
+
+---
+
+### **Test Case 3: Marking a non-existent document as read**
+
+| **STEP #** | **STEP DESCRIPTION**                                       | **EXPECTED RESULT**                                     | **ACTION**       |
+|------------|-----------------------------------------------------------|--------------------------------------------------------|------------------|
+| 1          | Attempt to retrieve a non-existent document.              | API returns **404 Not Found**.                         | Perform `GET /documents/{guid}/{date}` with invalid `GUID`. |
+| 2          | Call `PATCH /documents/{guid}/{date}/open` for the invalid document. | API returns **404 Not Found**.                         | Validate response for non-existent document. |
+| 3          | Verify Kibana logs.                                       | Error details (e.g., `GUID`, status code, error message) are logged in Kibana. | Check logs in Kibana.                   |
+
+---
+
+### **Test Case 4: Logging on Success**
+
+| **STEP #** | **STEP DESCRIPTION**                                       | **EXPECTED RESULT**                                     | **ACTION**       |
+|------------|-----------------------------------------------------------|--------------------------------------------------------|------------------|
+| 1          | Retrieve a document with valid `GUID` and `date`.         | Document is successfully retrieved.                    | Perform `GET /documents/{guid}/{date}`. |
+| 2          | Call `PATCH /documents/{guid}/{date}/open`.               | API returns **200 OK**, and success log is created in Kibana. | Perform API call and check Kibana logs. |
+
+---
+
+Would you like additional test cases or refinements? 😊
