@@ -1,14 +1,52 @@
-Here's how the integration test cases would look in the specified format:
+Here’s how the individual test cases can be broken down step-by-step in the desired format:
 
 ---
 
-| **STEP #** | **STEP DESCRIPTION**                                                                                         | **EXPECTED RESULT**                                                                                      | **ACTION** |
-|------------|-------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------|------------|
-| 1          | Make a GET request to the retrieval service API with a valid `documentGuid` and `memberId`.                 | The API should return a 200 HTTP status code with a success message indicating ownership confirmation.   |            |
-| 2          | Make a GET request with a `documentGuid` that does not exist in DynamoDB.                                   | The API should return a 404 HTTP status code with an error message: *"Document not found"*.              |            |
-| 3          | Simulate a failure where DynamoDB is unavailable (e.g., shut down DynamoDB).                                | The API should return a 500 HTTP status code with a generic error message: *"Service unavailable"*.      |            |
-| 4          | Make a GET request with invalid `documentGuid` or missing `memberId`.                                       | The API should return a 400 HTTP status code with an error message: *"Invalid input parameters"*.        |            |
-| 5          | Verify successful and failed calls are logged in Kibana or Datadog with details (`documentGuid`, `memberId`).| All successful and failed calls should be logged appropriately in the logging system.                   |            |
-| 6          | Trigger an unknown failure in the retrieval service (e.g., overload the service).                           | The API should return a 500 HTTP status code with a generic error message: *"Unexpected error occurred"*.|            |
+### Test Case 1: Successful Ownership Confirmation  
+| **STEP #** | **STEP DESCRIPTION**                                                                 | **EXPECTED RESULT**                                                                                  | **ACTION** |
+|------------|---------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|------------|
+| 1          | Retrieve a document with a valid `documentGuid` and `memberId`.                      | API returns 200 HTTP status with confirmation of ownership in response payload.                      |            |
+| 2          | Confirm the response payload contains ownership information mapped to the `memberId`.| Response payload correctly indicates document ownership with expected data.                          |            |
 
-Let me know if you'd like to refine or expand on these steps! 😊
+---
+
+### Test Case 2: Non-Existent Document  
+| **STEP #** | **STEP DESCRIPTION**                                                                   | **EXPECTED RESULT**                                                                                  | **ACTION** |
+|------------|-----------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|------------|
+| 1          | Attempt to retrieve a document with a `documentGuid` that does not exist in DynamoDB.  | API returns 404 HTTP status with an error message: *"Document not found"*.                          |            |
+| 2          | Verify no ownership data is returned in the response payload.                          | Response payload is empty or null, indicating no ownership information is available.                |            |
+
+---
+
+### Test Case 3: DynamoDB Unavailable  
+| **STEP #** | **STEP DESCRIPTION**                                                                 | **EXPECTED RESULT**                                                                                  | **ACTION** |
+|------------|---------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|------------|
+| 1          | Shut down or simulate unavailability of DynamoDB.                                    | DynamoDB service is unavailable.                                                                    |            |
+| 2          | Attempt to retrieve a document with a valid `documentGuid` and `memberId`.           | API returns 500 HTTP status with a generic error message: *"Service unavailable"*.                  |            |
+
+---
+
+### Test Case 4: Invalid Input Parameters  
+| **STEP #** | **STEP DESCRIPTION**                                                                  | **EXPECTED RESULT**                                                                                  | **ACTION** |
+|------------|----------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|------------|
+| 1          | Make a GET request with an invalid `documentGuid` or missing `memberId`.              | API returns 400 HTTP status with an error message: *"Invalid input parameters"*.                    |            |
+| 2          | Validate that the API doesn’t proceed to make a DynamoDB call or any other operations.| API terminates processing early and only logs the error in the system logs.                         |            |
+
+---
+
+### Test Case 5: Logging Validation  
+| **STEP #** | **STEP DESCRIPTION**                                                               | **EXPECTED RESULT**                                                                                  | **ACTION** |
+|------------|-----------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|------------|
+| 1          | Perform a successful retrieval with a valid `documentGuid` and `memberId`.       | Logs in Kibana/Datadog show details of the successful request (`documentGuid`, `memberId`).         |            |
+| 2          | Perform a failed retrieval (e.g., non-existent `documentGuid`).                  | Logs in Kibana/Datadog contain error details, including the invalid `documentGuid` used.            |            |
+| 3          | Simulate a DynamoDB failure (e.g., service unavailable).                         | Logs in Kibana/Datadog show error details for DynamoDB failure with context information provided.   |            |
+
+---
+
+### Test Case 6: Unexpected Failure  
+| **STEP #** | **STEP DESCRIPTION**                                                                      | **EXPECTED RESULT**                                                                                  | **ACTION** |
+|------------|------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|------------|
+| 1          | Simulate an unexpected service failure (e.g., overload or memory error).                 | API returns 500 HTTP status with a generic error message: *"Unexpected error occurred"*.             |            |
+| 2          | Confirm the error is logged in the monitoring tool (Kibana/Datadog) with sufficient details.| Logs contain details of the failure with request context (`documentGuid`, `memberId`, etc.).        |            |
+
+Let me know if more test cases or variations are needed!
