@@ -1,44 +1,14 @@
-Here’s how you can structure the integration test cases in the provided format:
+Here's how the integration test cases would look in the specified format:
 
 ---
 
-### **Test Case 1: Successful marking of document as read**
+| **STEP #** | **STEP DESCRIPTION**                                                                                         | **EXPECTED RESULT**                                                                                      | **ACTION** |
+|------------|-------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------|------------|
+| 1          | Make a GET request to the retrieval service API with a valid `documentGuid` and `memberId`.                 | The API should return a 200 HTTP status code with a success message indicating ownership confirmation.   |            |
+| 2          | Make a GET request with a `documentGuid` that does not exist in DynamoDB.                                   | The API should return a 404 HTTP status code with an error message: *"Document not found"*.              |            |
+| 3          | Simulate a failure where DynamoDB is unavailable (e.g., shut down DynamoDB).                                | The API should return a 500 HTTP status code with a generic error message: *"Service unavailable"*.      |            |
+| 4          | Make a GET request with invalid `documentGuid` or missing `memberId`.                                       | The API should return a 400 HTTP status code with an error message: *"Invalid input parameters"*.        |            |
+| 5          | Verify successful and failed calls are logged in Kibana or Datadog with details (`documentGuid`, `memberId`).| All successful and failed calls should be logged appropriately in the logging system.                   |            |
+| 6          | Trigger an unknown failure in the retrieval service (e.g., overload the service).                           | The API should return a 500 HTTP status code with a generic error message: *"Unexpected error occurred"*.|            |
 
-| **STEP #** | **STEP DESCRIPTION**                                       | **EXPECTED RESULT**                                     | **ACTION**       |
-|------------|-----------------------------------------------------------|--------------------------------------------------------|------------------|
-| 1          | Retrieve a document with valid `GUID` and `date`.         | Document is successfully retrieved.                    | Perform `GET /documents/{guid}/{date}`. |
-| 2          | Call `PATCH /documents/{guid}/{date}/open` to mark it read.| API returns **200 OK**.                                | Perform API call and validate response. |
-| 3          | Verify document's status.                                 | Document status is updated to "read" in the system.    | Check database or API response.         |
-
----
-
-### **Test Case 2: Service call failure while marking document as read**
-
-| **STEP #** | **STEP DESCRIPTION**                                       | **EXPECTED RESULT**                                     | **ACTION**       |
-|------------|-----------------------------------------------------------|--------------------------------------------------------|------------------|
-| 1          | Retrieve a document with valid `GUID` and `date`.         | Document is successfully retrieved.                    | Perform `GET /documents/{guid}/{date}`. |
-| 2          | Simulate a failure in `PATCH /documents/{guid}/{date}/open` (e.g., return **500 Internal Server Error**). | API returns an error response.                         | Inject error or simulate failure in service. |
-| 3          | Verify Kibana logs.                                       | Error details (e.g., `GUID`, status code, error message) are logged in Kibana. | Check logs in Kibana.                   |
-
----
-
-### **Test Case 3: Marking a non-existent document as read**
-
-| **STEP #** | **STEP DESCRIPTION**                                       | **EXPECTED RESULT**                                     | **ACTION**       |
-|------------|-----------------------------------------------------------|--------------------------------------------------------|------------------|
-| 1          | Attempt to retrieve a non-existent document.              | API returns **404 Not Found**.                         | Perform `GET /documents/{guid}/{date}` with invalid `GUID`. |
-| 2          | Call `PATCH /documents/{guid}/{date}/open` for the invalid document. | API returns **404 Not Found**.                         | Validate response for non-existent document. |
-| 3          | Verify Kibana logs.                                       | Error details (e.g., `GUID`, status code, error message) are logged in Kibana. | Check logs in Kibana.                   |
-
----
-
-### **Test Case 4: Logging on Success**
-
-| **STEP #** | **STEP DESCRIPTION**                                       | **EXPECTED RESULT**                                     | **ACTION**       |
-|------------|-----------------------------------------------------------|--------------------------------------------------------|------------------|
-| 1          | Retrieve a document with valid `GUID` and `date`.         | Document is successfully retrieved.                    | Perform `GET /documents/{guid}/{date}`. |
-| 2          | Call `PATCH /documents/{guid}/{date}/open`.               | API returns **200 OK**, and success log is created in Kibana. | Perform API call and check Kibana logs. |
-
----
-
-Would you like additional test cases or refinements? 😊
+Let me know if you'd like to refine or expand on these steps! 😊
