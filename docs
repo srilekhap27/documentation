@@ -1,52 +1,29 @@
-Here’s how the individual test cases can be broken down step-by-step in the desired format:
+pm.test("Response should contain No document was found with documentguid, display date and partyId provided", function () {
+    var responseData = responseBody; // Retrieve raw response body
+    var expectedResponse = "No document was found with documentguid, display date and partyId provided";
 
----
+    console.log("Actual Response Data:", JSON.stringify(responseData));
+    console.log("Expected Response Data:", JSON.stringify(expectedResponse));
+    
+    console.log("Actual Response Length:", responseData.length);
+    console.log("Expected Response Length:", expectedResponse.length);
 
-### Test Case 1: Successful Ownership Confirmation  
-| **STEP #** | **STEP DESCRIPTION**                                                                 | **EXPECTED RESULT**                                                                                  | **ACTION** |
-|------------|---------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|------------|
-| 1          | Retrieve a document with a valid `documentGuid` and `memberId`.                      | API returns 200 HTTP status with confirmation of ownership in response payload.                      |            |
-| 2          | Confirm the response payload contains ownership information mapped to the `memberId`.| Response payload correctly indicates document ownership with expected data.                          |            |
+    // Character-by-character comparison to identify discrepancies
+    for (let i = 0; i < Math.max(responseData.length, expectedResponse.length); i++) {
+        if (responseData[i] !== expectedResponse[i]) {
+            console.log(
+                `Difference at index ${i}: Actual="${responseData[i] || "(none)"}", Expected="${expectedResponse[i] || "(none)"}"`
+            );
+        }
+    }
 
----
+    // Normalize and compare
+    var normalizedResponse = responseData.trim().replace(/\s+/g, " ");
+    var normalizedExpected = expectedResponse.trim().replace(/\s+/g, " ");
+    console.log("Normalized Actual Response:", JSON.stringify(normalizedResponse));
+    console.log("Normalized Expected Response:", JSON.stringify(normalizedExpected));
 
-### Test Case 2: Non-Existent Document  
-| **STEP #** | **STEP DESCRIPTION**                                                                   | **EXPECTED RESULT**                                                                                  | **ACTION** |
-|------------|-----------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|------------|
-| 1          | Attempt to retrieve a document with a `documentGuid` that does not exist in DynamoDB.  | API returns 404 HTTP status with an error message: *"Document not found"*.                          |            |
-| 2          | Verify no ownership data is returned in the response payload.                          | Response payload is empty or null, indicating no ownership information is available.                |            |
-
----
-
-### Test Case 3: DynamoDB Unavailable  
-| **STEP #** | **STEP DESCRIPTION**                                                                 | **EXPECTED RESULT**                                                                                  | **ACTION** |
-|------------|---------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|------------|
-| 1          | Shut down or simulate unavailability of DynamoDB.                                    | DynamoDB service is unavailable.                                                                    |            |
-| 2          | Attempt to retrieve a document with a valid `documentGuid` and `memberId`.           | API returns 500 HTTP status with a generic error message: *"Service unavailable"*.                  |            |
-
----
-
-### Test Case 4: Invalid Input Parameters  
-| **STEP #** | **STEP DESCRIPTION**                                                                  | **EXPECTED RESULT**                                                                                  | **ACTION** |
-|------------|----------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|------------|
-| 1          | Make a GET request with an invalid `documentGuid` or missing `memberId`.              | API returns 400 HTTP status with an error message: *"Invalid input parameters"*.                    |            |
-| 2          | Validate that the API doesn’t proceed to make a DynamoDB call or any other operations.| API terminates processing early and only logs the error in the system logs.                         |            |
-
----
-
-### Test Case 5: Logging Validation  
-| **STEP #** | **STEP DESCRIPTION**                                                               | **EXPECTED RESULT**                                                                                  | **ACTION** |
-|------------|-----------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|------------|
-| 1          | Perform a successful retrieval with a valid `documentGuid` and `memberId`.       | Logs in Kibana/Datadog show details of the successful request (`documentGuid`, `memberId`).         |            |
-| 2          | Perform a failed retrieval (e.g., non-existent `documentGuid`).                  | Logs in Kibana/Datadog contain error details, including the invalid `documentGuid` used.            |            |
-| 3          | Simulate a DynamoDB failure (e.g., service unavailable).                         | Logs in Kibana/Datadog show error details for DynamoDB failure with context information provided.   |            |
-
----
-
-### Test Case 6: Unexpected Failure  
-| **STEP #** | **STEP DESCRIPTION**                                                                      | **EXPECTED RESULT**                                                                                  | **ACTION** |
-|------------|------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|------------|
-| 1          | Simulate an unexpected service failure (e.g., overload or memory error).                 | API returns 500 HTTP status with a generic error message: *"Unexpected error occurred"*.             |            |
-| 2          | Confirm the error is logged in the monitoring tool (Kibana/Datadog) with sufficient details.| Logs contain details of the failure with request context (`documentGuid`, `memberId`, etc.).        |            |
-
-Let me know if more test cases or variations are needed!
+    // Test case validation
+    tests["Response should contain No document was found with documentguid, display date and partyId provided"] = 
+        normalizedResponse === normalizedExpected;
+});
