@@ -1,29 +1,52 @@
-pm.test("Response should contain No document was found with documentguid, display date and partyId provided", function () {
-    var responseData = responseBody; // Retrieve raw response body
-    var expectedResponse = "No document was found with documentguid, display date and partyId provided";
+Here’s how we can write **integration test steps** in the format shown in your screenshot (Step #, Step Description, Expected Result, Action):
 
-    console.log("Actual Response Data:", JSON.stringify(responseData));
-    console.log("Expected Response Data:", JSON.stringify(expectedResponse));
-    
-    console.log("Actual Response Length:", responseData.length);
-    console.log("Expected Response Length:", expectedResponse.length);
+---
 
-    // Character-by-character comparison to identify discrepancies
-    for (let i = 0; i < Math.max(responseData.length, expectedResponse.length); i++) {
-        if (responseData[i] !== expectedResponse[i]) {
-            console.log(
-                `Difference at index ${i}: Actual="${responseData[i] || "(none)"}", Expected="${expectedResponse[i] || "(none)"}"`
-            );
-        }
-    }
+### Integration Test Cases for "On Prem Retrieval: Integrate with Content Storage to GET the Document Content"
 
-    // Normalize and compare
-    var normalizedResponse = responseData.trim().replace(/\s+/g, " ");
-    var normalizedExpected = expectedResponse.trim().replace(/\s+/g, " ");
-    console.log("Normalized Actual Response:", JSON.stringify(normalizedResponse));
-    console.log("Normalized Expected Response:", JSON.stringify(normalizedExpected));
+---
 
-    // Test case validation
-    tests["Response should contain No document was found with documentguid, display date and partyId provided"] = 
-        normalizedResponse === normalizedExpected;
-});
+#### **Test Case 1: Successfully Retrieve a Document**
+
+| **Step #** | **Step Description**                                                                                                                                       | **Expected Result**                                                                                      | **Action**                                                                                                                                                                                                 |
+|------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 1          | Send a GET request to the On-Prem Retrieval service endpoint with valid `documentGUID` and `partyID`.                                                     | The response returns an HTTP `200 OK` status code.                                                       | Use Postman or an automated test tool to send the GET request to the specified endpoint with valid parameters.                                                     |
+| 2          | Verify the response body contains a success message: `"message": "success"`.                                                                              | The response body matches the expected JSON structure with the success message.                          | Compare the response JSON against the expected body (`{"message": "success"}`).                                                                                    |
+
+---
+
+#### **Test Case 2: Document Not Found (404)**
+
+| **Step #** | **Step Description**                                                                                                                                       | **Expected Result**                                                                                      | **Action**                                                                                                                                                                                                 |
+|------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 1          | Send a GET request to the On-Prem Retrieval service endpoint with an invalid or non-existing `documentGUID`.                                              | The response returns an HTTP `404 Not Found` status code.                                                | Use Postman or an automated test tool to send the GET request with invalid `documentGUID`.                                                                          |
+| 2          | Verify the response body contains an error message: `"message": "not found"`.                                                                             | The response body matches the expected JSON structure with the not found error message.                  | Compare the response JSON against the expected body (`{"message": "not found"}`).                                                                                   |
+| 3          | Verify the service logs the error as part of the error handling process.                                                                                  | Logs indicate the error was logged with the corresponding GUID and party ID details.                     | Check the service logs for appropriate error logging.                                                                                                               |
+
+---
+
+#### **Test Case 3: Internal Server Error (500)**
+
+| **Step #** | **Step Description**                                                                                                                                       | **Expected Result**                                                                                      | **Action**                                                                                                                                                                                                 |
+|------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 1          | Simulate a server-side failure by sending a request that causes an error on the server (e.g., missing a required header or invalid query parameter).        | The response returns an HTTP `500 Internal Server Error` status code.                                    | Send a request to trigger an internal error (e.g., omit required headers or query parameters).                                                                      |
+| 2          | Verify the response body contains an error message: `"message": "error"`.                                                                                 | The response body matches the expected JSON structure with the error message.                            | Compare the response JSON against the expected body (`{"message": "error"}`).                                                                                       |
+| 3          | Verify the service logs the error as part of the error handling process.                                                                                  | Logs indicate the error was logged with details of the failed request.                                   | Check the service logs for appropriate error logging.                                                                                                               |
+
+---
+
+#### **Test Case 4: Invalid Request (400 Bad Request)**
+
+| **Step #** | **Step Description**                                                                                                                                       | **Expected Result**                                                                                      | **Action**                                                                                                                                                                                                 |
+|------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 1          | Send a GET request to the On-Prem Retrieval service endpoint with missing required fields like `documentGUID` or `partyID`.                               | The response returns an HTTP `400 Bad Request` status code.                                              | Use Postman or an automated test tool to send the GET request with missing required fields.                                                                         |
+| 2          | Verify the response body contains an error message: `"message": "Missing or Invalid Document GUID"`.                                                      | The response body matches the expected JSON structure with the missing/invalid error message.            | Compare the response JSON against the expected body (`{"message": "Missing or Invalid Document GUID"}`).                                                            |
+
+---
+
+### Notes:
+- Ensure proper environment configuration (e.g., API keys, headers) for all test cases.
+- Use automated tools (e.g., Postman or integration test frameworks) to execute these test steps and validate the results.
+- Ensure service logs are appropriately checked for error scenarios.
+
+Let me know if you need further refinement or additional scenarios! 🚀
